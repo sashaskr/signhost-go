@@ -3,6 +3,7 @@ package signhost
 import (
 	"bytes"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -45,7 +46,7 @@ func (fs *FileService) Put(file File) (f *File, err error) {
 	writer.Close()
 
 	req, err := fs.client.NewAPIRequest(http.MethodPut, u, body)
-	req.Header.Add("Digest", pdf.FileDigest)
+	//req.Header.Add("Digest", pdf.FileDigest) TODO: Add file digest functionality
 	req.Header.Set("Content-Type", "application/pdf")
 
 	res, err := fs.client.Do(req)
@@ -55,11 +56,11 @@ func (fs *FileService) Put(file File) (f *File, err error) {
 	return
 }
 
-func (f *File) SetFile(transactionID, fileID, filePath string) *File {
-	f.FileID = fileID
-	f.TransactionID = transactionID
-	f.filePath = filePath
-	return f
+func (file *File) SetFile(transactionID, fileID, filePath string) *File {
+	file.FileID = fileID
+	file.TransactionID = transactionID
+	file.filePath = filePath
+	return file
 }
 
 func CreatePdfFile(path string) *FilePDF {
@@ -72,7 +73,8 @@ func CreatePdfFile(path string) *FilePDF {
 	if _, err := io.Copy(hash, file); err != nil {
 		log.Fatal(err)
 	}
-	var h string = fmt.Sprintf("%x", hash.Sum(nil))
+	encoded := base64.StdEncoding.EncodeToString(hash.Sum(nil))
+	var h  = fmt.Sprintf("SHA256=%s", encoded)
 
 	return &FilePDF{
 		FilePath:   path,

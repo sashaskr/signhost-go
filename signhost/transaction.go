@@ -11,7 +11,7 @@ type TransactionService service
 
 type Transaction struct {
 	Id                     string `json:"Id,omitempty"`
-	Files                  map[string]FileEntry
+	Files                  map[string]FileEntry `json:"files,omitempty"`
 	Seal                   bool     `json:"Seal,omitempty"`
 	Signers                []Signer `json:"Signers,omitempty"`
 	Reference              string   `json:"Reference,omitempty"`
@@ -44,6 +44,8 @@ type Signer struct {
 	ReturnUrl            string     `json:"ReturnUrl,omitempty"`
 	Context              Context    `json:"Context,omitempty"`
 	Activities           []Activity `json:"Activities,omitempty"`
+	RequireScribble      bool       `json:"RequireScribble,omitempty"`
+	ScribbleNameFixed    bool       `json:"ScribbleNameFixed,omitempty"`
 }
 
 type Authentication struct {
@@ -123,10 +125,9 @@ func (ts *TransactionService) Get(transactionID string) (tt *Transaction, err er
 	return
 }
 
-//
-//func (tr *Transaction) AddSigner(signer *Signer) []Signer {
-//	return append(tr.Signers, *signer)
-//}
+func (tr *Transaction) AddSigner(signer *Signer) []Signer {
+	return append(tr.Signers, *signer)
+}
 
 func (s *Signer) AddVerification(verification *Verification) []Verification {
 	return append(s.Verifications, *verification)
