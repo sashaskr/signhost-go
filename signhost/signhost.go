@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -147,17 +148,25 @@ func NewClient(baseClient *http.Client, c *Config) (signhost *Client, err error)
 	_, b, _, _ := runtime.Caller(0)
 	basepath := filepath.Dir(b)
 	viper.SetConfigFile(basepath + "/../.env")
-	err = viper.ReadInConfig()
-	if err != nil {
-		log.Fatalf("Error while reading config file %s", err)
+	//viper.AutomaticEnv()
+	_ = viper.ReadInConfig()
+	var token, appKey string
+	var okToken, okAppKey bool
+	if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+		log.Println("Not .env file found, searching for OS ENV...")
+		token, okToken  = os.LookupEnv(c.auth)
+		fmt.Println(token)
+		if !okToken {
+			log.Fatalf("Error while reading os.env=%s", c.auth)
+		}
+		appKey, okAppKey  = os.LookupEnv(c.appKey)
+		if !okAppKey {
+			log.Fatalf("Error while reading os.env=%s", c.appKey)
+		}
+	} else {
+		token, okToken  = viper.Get(c.auth).(string)
+		appKey, okAppKey  = viper.Get(c.appKey).(string)
 	}
-	//token, okToken := os.LookupEnv(c.auth)
-	token, okToken := viper.Get(c.auth).(string)
-	if !okToken {
-
-	}
-	appKey, okAppKey := viper.Get(c.appKey).(string)
-	//appKey, okAppKey := os.LookupEnv(c.appKey)
 
 	if okToken && okAppKey {
 		signhost.authentication = token

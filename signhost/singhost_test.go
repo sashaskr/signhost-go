@@ -1,6 +1,7 @@
 package signhost
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -32,6 +33,7 @@ func teardown() {
 }
 
 func TestNewClient(t *testing.T) {
+	setEnv()
 	setup()
 	var c = http.DefaultClient
 	{
@@ -65,9 +67,10 @@ func TestNewClient(t *testing.T) {
 }
 
 func TestNewClientWithEnvVars(t *testing.T) {
+	setup()
 	setEnv()
 	defer unsetEnv()
-
+	fmt.Println(os.Getenv(APITokenEnv))
 	var c = http.DefaultClient
 	{
 		c.Timeout = 25 * time.Second
@@ -106,6 +109,7 @@ func TestNewClientWithEnvVars(t *testing.T) {
 }
 
 func TestClient_NewAPIRequest(t *testing.T) {
+	setEnv()
 	setup()
 	defer teardown()
 
