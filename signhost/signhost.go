@@ -155,7 +155,6 @@ func NewClient(baseClient *http.Client, c *Config) (signhost *Client, err error)
 	if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
 		log.Println("Not .env file found, searching for OS ENV...")
 		token, okToken  = os.LookupEnv(c.auth)
-		fmt.Println(token)
 		if !okToken {
 			log.Fatalf("Error while reading os.env=%s", c.auth)
 		}
