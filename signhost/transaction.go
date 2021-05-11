@@ -10,18 +10,19 @@ import (
 type TransactionService service
 
 type Transaction struct {
-	Id                     string `json:"Id,omitempty"`
+	Id                     string               `json:"Id,omitempty"`
 	Files                  map[string]FileEntry `json:"files,omitempty"`
-	Seal                   bool     `json:"Seal,omitempty"`
-	Signers                []Signer `json:"Signers,omitempty"`
-	Reference              string   `json:"Reference,omitempty"`
-	PostbackUrl            string   `json:"PostbackUrl,omitempty"`
-	SignRequestMode        int32    `json:"SignRequestMode,omitempty"`
-	DaysToExpire           int32    `json:"DaysToExpire,omitempty"`
-	SendEmailNotifications bool     `json:"SendEmailNotifications,omitempty"`
-	Status                 int32    `json:"Status,omitempty"`
-	CancellationReason     string   `json:"CancellationReason,omitempty"`
-	Context                Context  `json:"Context,omitempty"`
+	Seal                   bool                 `json:"Seal,omitempty"`
+	Signers                []Signer             `json:"Signers,omitempty"`
+	Reference              string               `json:"Reference,omitempty"`
+	PostbackUrl            string               `json:"PostbackUrl,omitempty"`
+	SignRequestMode        int32                `json:"SignRequestMode,omitempty"`
+	DaysToExpire           int32                `json:"DaysToExpire,omitempty"`
+	SendEmailNotifications bool                 `json:"SendEmailNotifications,omitempty"`
+	Status                 int32                `json:"Status,omitempty"`
+	CancelationReason      string               `json:"CancelationReason,omitempty"`
+	Context                Context              `json:"Context,omitempty"`
+	Reason                 string               `json:"Reason,omitempty"`
 }
 
 type Signer struct {
@@ -117,6 +118,25 @@ func (ts *TransactionService) Get(transactionID string) (tt *Transaction, err er
 		return
 	}
 
+	if err = json.Unmarshal(res.content, &tt); err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	return
+}
+
+func (ts *TransactionService) Delete(t *Transaction) (tt *Transaction, err error) {
+	u := fmt.Sprintf("transaction/%s", t.Id)
+	req, err := ts.client.NewAPIRequest(http.MethodDelete, u, &t)
+	if err != nil {
+		return
+	}
+
+	res, err := ts.client.Do(req)
+	if err != nil {
+		return
+	}
 	if err = json.Unmarshal(res.content, &tt); err != nil {
 		log.Fatal(err)
 		return

@@ -85,3 +85,45 @@ func TestTransactionService_Post(t *testing.T) {
 	}
 	unsetEnv()
 }
+
+func TestTransactionService_Delete(t *testing.T) {
+	setEnv()
+	setup()
+	defer teardown()
+
+	id := "67b9e140-b0f6-4c36-9b35-977041968185"
+	_ = tClient.WithAuthenticationValue("banana_token", "dsfksdjfksjdlfs")
+	tMux.HandleFunc("/transaction/"+id, func(w http.ResponseWriter, r *http.Request) {
+		testHeader(t, r, AuthHeader, "APIKey banana_token")
+		testHeader(t, r, ApplicationHeader, "APPKey dsfksdjfksjdlfs")
+		testMethod(t, r, "DELETE")
+		if _, ok := r.Header[AuthHeader]; !ok {
+			w.WriteHeader(http.StatusUnauthorized)
+		}
+		if _, ok := r.Header[ApplicationHeader]; !ok {
+			w.WriteHeader(http.StatusUnauthorized)
+		}
+
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(testdata.DeleteTransactionResponse))
+	})
+
+	var transaction = &Transaction{}
+	err := json.Unmarshal([]byte(testdata.DeleteTransactionRequest), &transaction)
+	if err != nil {
+		t.Error(err)
+	}
+	c, err := tClient.Transaction.Delete(transaction)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if c.Id != id {
+		t.Errorf("unexpected response: got %s, want %s", c.Id, id)
+	}
+
+	if c.CancelationReason != transaction.Reason  {
+		t.Errorf("unexpected response: got %s, want %s",c.CancelationReason, transaction.Reason)
+	}
+	unsetEnv()
+}
