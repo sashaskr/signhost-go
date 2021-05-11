@@ -10,10 +10,10 @@ import (
 type TransactionService service
 
 type Transaction struct {
-	Id                     string   `json:"Id,omitempty"`
-	Files                  []File   `json:"FileEntry,omitempty"`
+	Id                     string `json:"Id,omitempty"`
+	Files                  map[string]FileEntry
 	Seal                   bool     `json:"Seal,omitempty"`
-	Signers                []Signer `json:"Signers"`
+	Signers                []Signer `json:"Signers,omitempty"`
 	Reference              string   `json:"Reference,omitempty"`
 	PostbackUrl            string   `json:"PostbackUrl,omitempty"`
 	SignRequestMode        int32    `json:"SignRequestMode,omitempty"`
@@ -21,7 +21,7 @@ type Transaction struct {
 	SendEmailNotifications bool     `json:"SendEmailNotifications,omitempty"`
 	Status                 int32    `json:"Status,omitempty"`
 	CancellationReason     string   `json:"CancellationReason,omitempty"`
-	Context                string   `json:"Context,omitempty"`
+	Context                Context  `json:"Context,omitempty"`
 }
 
 type Signer struct {
@@ -42,20 +42,21 @@ type Signer struct {
 	Reference            string     `json:"Reference,omitempty"`
 	RejectReason         string     `json:"RejectReason,omitempty"`
 	ReturnUrl            string     `json:"ReturnUrl,omitempty"`
-	Context              string     `json:"Context,omitempty"`
+	Context              Context    `json:"Context,omitempty"`
 	Activities           []Activity `json:"Activities,omitempty"`
-	Receivers            []Receiver `json:"Receivers,omitempty"`
 }
 
 type Authentication struct {
-	Type string `json:"Type,omitempty"`
+	Type                   string `json:"Type,omitempty"`
+	Bsn                    string `json:"Bsn,omitempty"`
+	Betrouwbaarheidsniveau string `json:"Betrouwbaarheidsniveau,omitempty"`
 }
 
 type Verification struct {
 	Type string `json:"Type,omitempty"`
 }
 
-type File struct {
+type FileEntry struct {
 	Links       []Link `json:"Links,omitempty"`
 	DisplayName string `json:"DisplayName,omitempty"`
 }
@@ -74,14 +75,16 @@ type Activity struct {
 }
 
 type Receiver struct {
-	Name      string `json:"Name,omitempty"`
-	Email     string `json:"Email,omitempty"`
-	Language  string `json:"Language,omitempty"`
-	Subject   string `json:"Subject,omitempty"`
-	Message   string `json:"Message,omitempty"`
-	Reference string `json:"Reference,omitempty"`
-	Context   string `json:"Context,omitempty"`
+	Name      string  `json:"Name,omitempty"`
+	Email     string  `json:"Email,omitempty"`
+	Language  string  `json:"Language,omitempty"`
+	Subject   string  `json:"Subject,omitempty"`
+	Message   string  `json:"Message,omitempty"`
+	Reference string  `json:"Reference,omitempty"`
+	Context   Context `json:"Context,omitempty"`
 }
+
+type Context struct{}
 
 func (ts *TransactionService) Post(t *Transaction) (tt *Transaction, err error) {
 	req, err := ts.client.NewAPIRequest(http.MethodPost, "transaction", t)
@@ -120,9 +123,10 @@ func (ts *TransactionService) Get(transactionID string) (tt *Transaction, err er
 	return
 }
 
-func (tr *Transaction) AddSigner(signer *Signer) []Signer {
-	return append(tr.Signers, *signer)
-}
+//
+//func (tr *Transaction) AddSigner(signer *Signer) []Signer {
+//	return append(tr.Signers, *signer)
+//}
 
 func (s *Signer) AddVerification(verification *Verification) []Verification {
 	return append(s.Verifications, *verification)

@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"net/url"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"strings"
 )
@@ -44,10 +43,10 @@ type Client struct {
 	config         *Config
 	common         service
 	Transaction    *TransactionService
+	File           *FileService
 }
 
 var (
-	accessTokenExpr = regexp.MustCompile(`(?m)^access_`)
 	errEmptyAuthKey = errors.New("you must provide a non-empty authentication key")
 	errEmptyAppKey  = errors.New("you mush provide a non-empty application key")
 	errBadBaseURL   = errors.New("malformed base url, it must contain a trailing slash")
@@ -143,9 +142,10 @@ func NewClient(baseClient *http.Client, c *Config) (signhost *Client, err error)
 
 	// services for resources
 	signhost.Transaction = (*TransactionService)(&signhost.common)
+	signhost.File = (*FileService)(&signhost.common)
 	// services end
 	_, b, _, _ := runtime.Caller(0)
-	basepath   := filepath.Dir(b)
+	basepath := filepath.Dir(b)
 	viper.SetConfigFile(basepath + "/../.env")
 	err = viper.ReadInConfig()
 	if err != nil {
