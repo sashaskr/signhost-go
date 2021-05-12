@@ -10,6 +10,6 @@ func NewConfig(t bool, auth string, appKey string) *Config {
 	return &Config{
 		testing: t,
 		auth:    auth,
-		appKey: appKey,
+		appKey:  appKey,
 	}
 }

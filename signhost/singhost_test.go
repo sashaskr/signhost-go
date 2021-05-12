@@ -172,4 +172,3 @@ func testMethod(t *testing.T, r *http.Request, want string) {
 		t.Errorf("Request method: %v, want %v", got, want)
 	}
 }
-

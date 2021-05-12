@@ -141,8 +141,8 @@ func CreatePdfFile(path string) *FilePDF {
 }
 
 func GenerateDigest(file *os.File) string {
-	h:= sha256.New()
-	if _, err := io.Copy(h,file); err != nil {
+	h := sha256.New()
+	if _, err := io.Copy(h, file); err != nil {
 		log.Fatal(err)
 	}
 	sha256hash := fmt.Sprintf("%x", h.Sum(nil))

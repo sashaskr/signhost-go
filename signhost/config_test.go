@@ -12,22 +12,22 @@ func TestNewConfig(t *testing.T) {
 		appKey string
 	}
 
-	tests := []struct{
+	tests := []struct {
 		name string
 		args args
 		want *Config
-	} {
+	}{
 		{
 			"config set to testing and with API token and app token",
 			args{
-				t: true,
-				auth: APITokenEnv,
+				t:      true,
+				auth:   APITokenEnv,
 				appKey: AppKeyEnv,
 			},
 			&Config{
 				testing: true,
-				auth: "SIGNHOST_API_TOKEN",
-				appKey: "SIGNHOST_APP_KEY",
+				auth:    "SIGNHOST_API_TOKEN",
+				appKey:  "SIGNHOST_APP_KEY",
 			},
 		},
 		{
@@ -44,12 +44,12 @@ func TestNewConfig(t *testing.T) {
 		{
 			"config set to testing with develop and only API token",
 			args{
-				t:      true,
+				t:    true,
 				auth: APITokenEnv,
 			},
 			&Config{
 				testing: true,
-				auth:  "SIGNHOST_API_TOKEN",
+				auth:    "SIGNHOST_API_TOKEN",
 			},
 		},
 	}

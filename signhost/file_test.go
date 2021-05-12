@@ -102,7 +102,7 @@ func TestFileService_PutWithPdfFile(t *testing.T) {
 		TransactionID: id,
 		FileID:        fileID,
 		ContentType:   "application/pdf",
-		FilePath: "../testdata/sample.pdf",
+		FilePath:      "../testdata/sample.pdf",
 	}
 	var meta interface{}
 	_, err := tClient.File.Put(file, meta)

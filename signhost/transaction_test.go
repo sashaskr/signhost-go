@@ -81,7 +81,7 @@ func TestTransactionService_Post(t *testing.T) {
 	}
 
 	if c.Signers[0].Email != transaction.Signers[0].Email {
-		t.Errorf("unexpected response: got %s, want %s",c.Signers[0].Email, transaction.Signers[0].Email)
+		t.Errorf("unexpected response: got %s, want %s", c.Signers[0].Email, transaction.Signers[0].Email)
 	}
 	unsetEnv()
 }
@@ -122,8 +122,8 @@ func TestTransactionService_Delete(t *testing.T) {
 		t.Errorf("unexpected response: got %s, want %s", c.Id, id)
 	}
 
-	if c.CancelationReason != transaction.Reason  {
-		t.Errorf("unexpected response: got %s, want %s",c.CancelationReason, transaction.Reason)
+	if c.CancelationReason != transaction.Reason {
+		t.Errorf("unexpected response: got %s, want %s", c.CancelationReason, transaction.Reason)
 	}
 	unsetEnv()
 }
