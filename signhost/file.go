@@ -72,6 +72,9 @@ func (fs *FileService) Put(file File, meta interface{}) (v interface{}, err erro
 		body = GetPdfRequestBody(file)
 	}
 	req, err := fs.client.NewAPIRequest(http.MethodPut, u, body)
+	if err != nil {
+		log.Fatal(err)
+	}
 	if file.ContentType == RequestPdfContentType {
 		pdfDigest := CreatePdfFile(file.FilePath)
 		req.Header.Add("Digest", pdfDigest.FileDigest)
@@ -79,6 +82,9 @@ func (fs *FileService) Put(file File, meta interface{}) (v interface{}, err erro
 	req.Header.Set("Content-Type", file.ContentType)
 
 	res, err := fs.client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
 	if err = json.Unmarshal(res.content, &fs); err != nil {
 		return
 	}
@@ -115,8 +121,14 @@ func GetPdfRequestBody(file File) interface{} {
 	if err != nil {
 		log.Fatal(err)
 	}
-	io.Copy(part, fileTemp)
-	writer.Close()
+	_, err = io.Copy(part, fileTemp)
+	if err != nil {
+		return nil
+	}
+	err = writer.Close()
+	if err != nil {
+		return nil
+	}
 	return body
 }
 
