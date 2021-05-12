@@ -21,13 +21,16 @@ const (
 	BaseURL                string = "https://api.signhost.com/api/"
 	AuthHeader             string = "Authorization"
 	ApplicationHeader      string = "Application"
+	DigestHeader           string = "Digest"
 	RequestContentType     string = "application/json"
+	RequestPdfContentType  string = "application/pdf"
 	RequestAccept          string = "application/vnd.signhost.v1+json"
 	TokenTypeAuthorization string = "APIKey"
 	TokenTypeApplication   string = "APPKey"
 	Connection             string = "keep-alive"
 	APITokenEnv            string = "SIGNHOST_API_TOKEN"
 	AppKeyEnv              string = "SIGNHOST_APP_KEY"
+	ContentTypeHeader      string = "Content-Type"
 )
 
 type Response struct {
@@ -154,17 +157,17 @@ func NewClient(baseClient *http.Client, c *Config) (signhost *Client, err error)
 	var okToken, okAppKey bool
 	if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
 		log.Println("Not .env file found, searching for OS ENV...")
-		token, okToken  = os.LookupEnv(c.auth)
+		token, okToken = os.LookupEnv(c.auth)
 		if !okToken {
 			log.Fatalf("Error while reading os.env=%s", c.auth)
 		}
-		appKey, okAppKey  = os.LookupEnv(c.appKey)
+		appKey, okAppKey = os.LookupEnv(c.appKey)
 		if !okAppKey {
 			log.Fatalf("Error while reading os.env=%s", c.appKey)
 		}
 	} else {
-		token, okToken  = viper.Get(c.auth).(string)
-		appKey, okAppKey  = viper.Get(c.appKey).(string)
+		token, okToken = viper.Get(c.auth).(string)
+		appKey, okAppKey = viper.Get(c.appKey).(string)
 	}
 
 	if okToken && okAppKey {
