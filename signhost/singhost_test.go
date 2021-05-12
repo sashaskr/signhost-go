@@ -1,7 +1,6 @@
 package signhost
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -9,7 +8,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"time"
 )
 
 var (
@@ -30,82 +28,6 @@ func setup() {
 
 func teardown() {
 	tServer.Close()
-}
-
-func TestNewClient(t *testing.T) {
-	setEnv()
-	setup()
-	var c = http.DefaultClient
-	{
-		c.Timeout = 25 * time.Second
-	}
-
-	tests := []struct {
-		name   string
-		client *http.Client
-	}{
-		{
-			"nil returns a valid client",
-			nil,
-		},
-		{
-			"a passed client is decorated",
-			c,
-		},
-	}
-
-	conf := NewConfig(true, APITokenEnv, AppKeyEnv)
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			_, err := NewClient(tt.client, conf)
-			if err != nil {
-				t.Errorf("not nil error received: %v", err)
-			}
-		})
-	}
-}
-
-func TestNewClientWithEnvVars(t *testing.T) {
-	setup()
-	setEnv()
-	defer unsetEnv()
-	fmt.Println(os.Getenv(APITokenEnv))
-	var c = http.DefaultClient
-	{
-		c.Timeout = 25 * time.Second
-	}
-
-	tests := []struct {
-		name   string
-		client *http.Client
-	}{
-		{
-			"nil returns a valid client",
-			nil,
-		},
-		{
-			"a passed client is decorated",
-			c,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewClient(tt.client, tConf)
-			if err != nil {
-				t.Errorf("not nil error received: %v", err)
-			}
-
-			if got.authentication == "" {
-				t.Errorf("got empty api key %v, value %s expected", got.authentication, "banana_token")
-			}
-
-			if got.application == "" {
-				t.Errorf("got empty app key %v, value %s expected", got.application, "dsfksdjfksjdlfs")
-			}
-		})
-	}
 }
 
 func TestClient_NewAPIRequest(t *testing.T) {

@@ -148,14 +148,17 @@ func NewClient(baseClient *http.Client, c *Config) (signhost *Client, err error)
 	signhost.Transaction = (*TransactionService)(&signhost.common)
 	signhost.File = (*FileService)(&signhost.common)
 	// services end
-	_, b, _, _ := runtime.Caller(0)
+	_, b, _, _ := runtime.Caller(1)
 	basepath := filepath.Dir(b)
-	viper.SetConfigFile(basepath + "/../.env")
+	fmt.Printf("%s/.env\n", basepath)
+	viper.SetConfigFile(basepath + "/.env")
 	//viper.AutomaticEnv()
-	_ = viper.ReadInConfig()
+	err = viper.ReadInConfig()
 	var token, appKey string
 	var okToken, okAppKey bool
-	if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+	//i, ok := err.(viper.ConfigFileNotFoundError)
+	//fmt.Println(i)
+	if err != nil {
 		log.Println("Not .env file found, searching for OS ENV...")
 		token, okToken = os.LookupEnv(c.auth)
 		if !okToken {

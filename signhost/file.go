@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -82,6 +83,23 @@ func (fs *FileService) Put(file File, meta interface{}) (v interface{}, err erro
 		return
 	}
 	return
+}
+
+func (fs *FileService) Get(file File) (interface{}, error) {
+	u := fmt.Sprintf("transaction/%s/file/%s", file.TransactionID, file.FileID)
+	req, err := fs.client.NewAPIRequest(http.MethodGet, u, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	res, err := fs.client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = ioutil.WriteFile(file.FilePath, res.content, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return nil, nil
 }
 
 func GetPdfRequestBody(file File) interface{} {
