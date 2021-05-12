@@ -48,7 +48,8 @@ const PutFileWithMetaRequest = `{
 	}
 }`
 
-const PutFileWithMetaResponse =	`{
+const PutFileResponse =	`{
 	"status": "ok"
 }`
 
+const SampleFileDigest = "SHA256=OGRlY2M4NTcxOTQ2ZDRjZDcwYTAyNDk0OWUwMzNhMmEyYTU0Mzc3ZmU5ZjFjMWI5NDRjMjBmOWVlMTFhOWU1MQ=="

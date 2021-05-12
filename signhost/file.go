@@ -71,7 +71,10 @@ func (fs *FileService) Put(file File, meta interface{}) (v interface{}, err erro
 		body = GetPdfRequestBody(file)
 	}
 	req, err := fs.client.NewAPIRequest(http.MethodPut, u, body)
-	//req.Header.Add("Digest", pdf.FileDigest) TODO: Add file digest functionality
+	if file.ContentType == RequestPdfContentType {
+		pdfDigest := CreatePdfFile(file.FilePath)
+		req.Header.Add("Digest", pdfDigest.FileDigest)
+	}
 	req.Header.Set("Content-Type", file.ContentType)
 
 	res, err := fs.client.Do(req)
@@ -82,8 +85,7 @@ func (fs *FileService) Put(file File, meta interface{}) (v interface{}, err erro
 }
 
 func GetPdfRequestBody(file File) interface{} {
-	pdf := CreatePdfFile(file.FilePath)
-	fileTemp, err := os.Open(pdf.FilePath)
+	fileTemp, err := os.Open(file.FilePath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -112,16 +114,20 @@ func CreatePdfFile(path string) *FilePDF {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
-	hash := sha256.New()
-	if _, err := io.Copy(hash, file); err != nil {
-		log.Fatal(err)
-	}
-	encoded := base64.StdEncoding.EncodeToString(hash.Sum(nil))
-	var h = fmt.Sprintf("SHA256=%s", encoded)
+	fileDigest := GenerateDigest(file)
 
 	return &FilePDF{
 		FilePath:   path,
-		FileDigest: h,
+		FileDigest: fileDigest,
 	}
+}
+
+func GenerateDigest(file *os.File) string {
+	h:= sha256.New()
+	if _, err := io.Copy(h,file); err != nil {
+		log.Fatal(err)
+	}
+	sha256hash := fmt.Sprintf("%x", h.Sum(nil))
+	sEnc := base64.StdEncoding.EncodeToString([]byte(sha256hash))
+	return fmt.Sprintf("SHA256=%s", sEnc)
 }
